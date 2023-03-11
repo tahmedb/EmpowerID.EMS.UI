@@ -23,7 +23,7 @@ namespace EmpowerID.EMS.Service.Repository
             catch (Exception ex)
             {
                 LogHelper.Error("Error while creating employee", ex);
-                return false;
+                throw;
             }
         }
 
@@ -37,12 +37,12 @@ namespace EmpowerID.EMS.Service.Repository
 
         public async Task<Employee> GetEmployeeAsync(int employeeID)
         {
-            return await _dbContext.Query<Employee>().FirstAsync(x => x.Id == employeeID);
+            return await _dbContext.Query<Employee>().Include(x => x.department).FirstAsync(x => x.Id == employeeID);
         }
 
         public async Task<List<Employee>> GetEmployeesAsync()
         {
-            return await _dbContext.Query<Employee>().ToListAsync();
+            return await _dbContext.Query<Employee>().Include(x=>x.department).ToListAsync();
         }
 
         public async Task<List<Employee>> SearchEmployeeAsync(string term)

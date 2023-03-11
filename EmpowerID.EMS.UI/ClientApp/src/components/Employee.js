@@ -48,7 +48,7 @@ export class Employee extends Component {
                             <td>{employee.lastName}</td>
                             <td>{employee.email}</td>
                             <td>{employee.phoneNumber}</td>
-                            <td>{employee.departments}</td>
+                            <td>{(employee.department || {}).departmentName}</td>
                             <td>{employee.createdTime}</td>
                             <td>
                                 <Button color="warning"
@@ -111,10 +111,10 @@ export class Employee extends Component {
                                             type="email" name="phoneNumber" id="phoneNumber" placeholder="Phonenumber" />
                                     </FormGroup>
                                     <FormGroup>
-                                        <Label for="departments">Departments</Label>
+                                        <Label for="department">Departments</Label>
                                         <Input onChange={(event) => this.handleChange(event)}
-                                            type="select" name="departmentids" id="departments" multiple>
-                                            {(departments || []).map(department => <option key={department.id} value={department.id}>{department.name}</option>)}
+                                            type="select" name="departmentId" id="departmentId">
+                                            {(departments || []).map(department => <option key={department.id} value={department.id}>{department.departmentName}</option>)}
                                         </Input>
                                     </FormGroup>
                                     <FormGroup>
@@ -166,6 +166,7 @@ export class Employee extends Component {
             alert('please fill complete form')
             return;
         }
+        formData.departmentId = window.document.getElementById('departmentId').value;
         var raw = JSON.stringify(this.state.formData);
 
         var requestOptions = {
@@ -174,20 +175,22 @@ export class Employee extends Component {
             body: raw,
             redirect: 'follow'
         };
-
-        var response = await fetch("https://localhost:44441/api/employee", requestOptions)
-        console.log(response);
-        if (response.status != 200) {
-            alert('please provide all data')
-            return;
+        try {
+            var response = await fetch("https://localhost:44441/api/employee", requestOptions)
+            if (response.status != 200) {
+                alert('please provide all data ')
+                return;
+            }
+            this.toggle();
+            await this.getEmployees();
+        } catch (error) {
+            console.log('errors')
+            alert(error)
         }
-        this.toggle();
-        await this.getEmployees();
     }
 
     handleChange(event) {
         var target = event.target;
-        console.log('state data', this.state)
         this.setState({ ...this.state, formData: { ...this.state.formData, [target.name]: target.value } });
     }
 

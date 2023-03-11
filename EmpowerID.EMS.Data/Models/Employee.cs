@@ -13,5 +13,7 @@ namespace EmpowerID.EMS.Data.Models
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public int Salary { get; set; }
+        public Department? department { get; set; }
+        public int departmentId { get; set; }
     }
 }

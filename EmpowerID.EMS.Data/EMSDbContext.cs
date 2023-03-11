@@ -17,9 +17,21 @@ namespace EmpowerID.EMS.Data
         {
             optionsBuilder.UseInMemoryDatabase(databaseName: "EMSDbContext");
         }
-        public DbSet<Employee>  Employees{ get; set; }
+        public DbSet<Employee> Employees { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<DepartmentEmployee> MyProperty { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Employee>()
+            .HasOne(s => s.department)
+            .WithMany(g => g.employees)
+            .HasForeignKey(s => s.departmentId);
+
+
+        }
 
     }
 }

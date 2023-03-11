@@ -90,13 +90,13 @@ export class Department extends Component {
                                         <Input onChange={(event) => this.handleChange(event)} value={formData.departmentName || ''} type="text" name="departmentName" id="departmentName" placeholder="Name" />
                                     </FormGroup>
 
-                                    <FormGroup>
-                                        <Label for="departments">Employees</Label>
-                                        <Input onChange={(event) => this.handleChange(event)}
-                                            type="select" name="employeeIds" id="departments" multiple>
-                                            {(departments || []).map(department => <option key={department.id} value={department.id}>{department.name}</option>)}
-                                        </Input>
-                                    </FormGroup>
+                                    {/*<FormGroup>*/}
+                                    {/*    <Label for="departments">Employees</Label>*/}
+                                    {/*    <Input onChange={(event) => this.handleChange(event)}*/}
+                                    {/*        type="select" name="employeeIds" id="departments" multiple>*/}
+                                    {/*        {(departments || []).map(department => <option key={department.id} value={department.id}>{department.name}</option>)}*/}
+                                    {/*    </Input>*/}
+                                    {/*</FormGroup>*/}
 
                                 </Form>
                             </div>

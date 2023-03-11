@@ -6,7 +6,7 @@
         public int DepartmentId { get; set; }
 
         public Employee Employee { get; set; }
-        public Department Department { get; set; }
+        public Department? Department { get; set; }
         public DateTime DateFrom { get; set; }
         public DateTime DateTo { get; set; }
     }

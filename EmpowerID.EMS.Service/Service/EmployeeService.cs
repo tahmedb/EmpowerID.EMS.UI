@@ -8,9 +8,11 @@ namespace EmpowerID.EMS.Service.Service
     public class EmployeeService : IEmployeeService
     {
         private readonly IEmployeeRepository _employeeRepository;
-        public EmployeeService(IEmployeeRepository employeeRepository)
+        private readonly IDepartmentRepository _departmentRepository;
+        public EmployeeService(IEmployeeRepository employeeRepository, IDepartmentRepository departmentRepository)
         {
             _employeeRepository = employeeRepository;
+            _departmentRepository = departmentRepository;
         }
         public async Task<bool> Add(Employee entity)
         {
@@ -21,7 +23,7 @@ namespace EmpowerID.EMS.Service.Service
             catch (Exception ex)
             {
                 LogHelper.Error("Error while creating record", ex);
-                return false;
+                throw;
             }
         }
 
