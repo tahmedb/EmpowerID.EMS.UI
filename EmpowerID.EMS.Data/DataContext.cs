@@ -23,6 +23,12 @@ namespace EmpowerID.EMS.Data
             dbSet.Add(obj);
         }
 
+        public void Update<T>(T obj) where T : class
+        {
+            var dbSet = _context.Set<T>();
+            dbSet.Update(obj);
+        }
+
         public void AddAll<T>(IEnumerable<T> obj) where T : class
         {
             var dbSet = _context.Set<T>();

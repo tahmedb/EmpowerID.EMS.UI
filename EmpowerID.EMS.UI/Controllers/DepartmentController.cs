@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace EmpowerID.EMS.UI.Controllers
 {
 
-    public class EmployeeController : CrudController<Employee, IEmployeeService>
+    public class DepartmentController : CrudController<Department, IDepartmentService>
     {
-        public EmployeeController(IEmployeeService service) : base(service)
+        public DepartmentController(IDepartmentService service) : base(service)
         {
         }
     }

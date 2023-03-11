@@ -2,11 +2,6 @@
 using EmpowerID.EMS.Data.Models;
 using EmpowerID.EMS.Service.IRepository;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EmpowerID.EMS.Service.Repository
 {
@@ -17,28 +12,32 @@ namespace EmpowerID.EMS.Service.Repository
         {
             _dbContext = dbContext;
         }
-        public async Task<bool> AddEmployee(Employee employee)
+        public async Task<bool> AddEmployeeAsync(Employee employee)
         {
             try
             {
                 _dbContext.Add(employee);
                 await _dbContext.SaveAsync();
                 return true;
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 LogHelper.Error(ex);
                 return false;
             }
         }
 
-        public Task<bool> DeleteEmployee(int employeeID)
+        public async Task<bool> DeleteEmployeeAsync(int employeeID)
         {
-            throw new NotImplementedException();
+            var employee = await GetEmployeeAsync(employeeID);
+            _dbContext.Remove<Employee>(employee);
+            await _dbContext.SaveAsync();
+            return true;
         }
 
-        public Task<List<Employee>> GetEmployeeAsync(int employeeID)
+        public async Task<Employee> GetEmployeeAsync(int employeeID)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Query<Employee>().FirstAsync(x => x.Id == employeeID);
         }
 
         public async Task<List<Employee>> GetEmployeesAsync()
@@ -46,9 +45,11 @@ namespace EmpowerID.EMS.Service.Repository
             return await _dbContext.Query<Employee>().ToListAsync();
         }
 
-        public Task<bool> UpdateEmployee(Employee employee)
+        public async Task<bool> UpdateEmployeeAsync(Employee employee)
         {
-            throw new NotImplementedException();
+            _dbContext.Update<Employee>(employee);
+            await _dbContext.SaveAsync();
+            return true;
         }
     }
 }
