@@ -15,6 +15,8 @@ export class Employee extends Component {
         this.state = {
             employeeList: [], departments: [], loading: true, showAddDialog: false, formData: {}
         };
+        this.handleChange.bind(this);
+        this.toggle.bind(this);
     }
 
     componentDidMount() {
@@ -23,7 +25,7 @@ export class Employee extends Component {
 
 
 
-    static renderemployeeListTable(employeeList) {
+     renderemployeeListTable(employeeList) {
         return (
             <table className='table table-striped' aria-labelledby="tabelLabel">
                 <thead>
@@ -35,17 +37,21 @@ export class Employee extends Component {
                         <th>Phone</th>
                         <th>Departments</th>
                         <th>Created</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     {employeeList.map(employee =>
                         <tr key={employee.id}>
+                            <td>{employee.id}</td>
                             <td>{employee.firstName}</td>
                             <td>{employee.lastName}</td>
                             <td>{employee.email}</td>
-                            <td>{employee.PhoneNumber}</td>
+                            <td>{employee.phoneNumber}</td>
                             <td>{employee.departments}</td>
-                            <td>{employee.CreatedTime}</td>
+                            <td>{employee.createdTime}</td>
+                            <td> <Button color="warning"
+                                onClick={() => this.toggle(employee)}>Edit</Button></td>
                         </tr>
                     )}
                 </tbody>
@@ -56,23 +62,23 @@ export class Employee extends Component {
     render() {
         let contents = this.state.loading
             ? <p><em>Loading...</em></p>
-            : Employee.renderemployeeListTable(this.state.employeeList);
+            : this.renderemployeeListTable(this.state.employeeList);
 
-        var formData = this.state.formData;
+        var formData = this.state.formData || {};
         var departments = this.state.departments;
 
         return (
             <>
                 <div>
                     <h1 id="tabelLabel" >Employee List</h1>
+                    <Button color="primary"
+                        onClick={() => this.toggle()}>Add Modal</Button>
                     {contents}
                 </div>
                 <div style={{
                     display: 'block', width: 700, padding: 30
                 }}>
-                    <h4>ReactJS Reactstrap Modal Component</h4>
-                    <Button color="primary"
-                        onClick={() => this.toggle()}>Open Modal</Button>
+
                     <Modal isOpen={this.state.showAddDialog}
                         toggle={() => this.toggle()}
                         modalTransition={{ timeout: 300 }}>
@@ -82,36 +88,41 @@ export class Employee extends Component {
                                 <Form>
                                     <FormGroup>
                                         <Label for="firstName">First Name</Label>
-                                        <Input type="text" name="firstName" id="firstName" placeholder="with a placeholder" />
+                                        <Input onChange={(event) => this.handleChange(event)} value={formData.firstName} type="text" name="firstName" id="firstName" placeholder="First Name" />
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="lastName">Last Name</Label>
-                                        <Input type="text" name="lastName" id="lastName" placeholder="with a placeholder" />
+                                        <Input onChange={(event) => this.handleChange(event)} value={formData.lastName}
+                                            type="text" name="lastName" id="lastName" placeholder="Last Name" />
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="email">Email</Label>
-                                        <Input type="email" name="email" id="email" placeholder="with a placeholder" />
+                                        <Input onChange={(event) => this.handleChange(event)} value={formData.email}
+                                            type="email" name="email" id="email" placeholder="Email" />
                                     </FormGroup>
                                     <FormGroup>
-                                        <Label for="phoneNumber">Email</Label>
-                                        <Input type="email" name="phoneNumber" id="phoneNumber" placeholder="with a placeholder" />
+                                        <Label for="phoneNumber">Phonenumber</Label>
+                                        <Input onChange={(event) => this.handleChange(event)} value={formData.phoneNumber}
+                                            type="email" name="phoneNumber" id="phoneNumber" placeholder="Phonenumber" />
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="departments">Departments</Label>
-                                        <Input type="select" name="departmentids" id="departments" multiple>
+                                        <Input onChange={(event) => this.handleChange(event)} 
+                                            type="select" name="departmentids" id="departments" multiple>
                                             {(departments || []).map(department => <option key={department.id} value={department.id}>{department.name}</option>)}
                                         </Input>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="address">Address</Label>
-                                        <Input type="textarea" name="text" id="address" />
+                                        <Input onChange={(event) => this.handleChange(event)} value={formData.address}
+                                            type="textarea" name="address" id="address" />
                                     </FormGroup>
 
                                 </Form>
                             </div>
                         </ModalBody>
                         <ModalFooter>
-                            <Button color="primary" onClick={this.Save}>Save</Button>{' '}
+                            <Button color="primary" onClick={() =>this.save()}>Save</Button>{' '}
                             <Button color="secondary" onClick={() => this.toggle()}>Cancel</Button>
                         </ModalFooter>
                     </Modal>
@@ -119,20 +130,45 @@ export class Employee extends Component {
             </>
         );
     }
-    toggle() {
+    toggle(data) {
         var showdialog = this.state.showAddDialog;
-        this.setState({ ...this.state, showAddDialog: !showdialog })
+        this.setState({ ...this.state, showAddDialog: !showdialog, formData: data })
     }
 
-    save() {
+    async save() {
+        var myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        var formData = this.state.formData;
+        var raw = JSON.stringify(this.state.formData);
 
+        var requestOptions = {
+            method: formData.id ?'PUT': 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+        };
+
+        var response = await fetch("https://localhost:44441/api/employee", requestOptions)
+        console.log(response);
+        this.toggle();
+        await this.getEmployees();
+    }
+
+    handleChange(event) {
+        var target = event.target;
+        console.log('state data', this.state)
+        this.setState({ ...this.state, formData: { ...this.state.formData, [target.name]: target.value } });
+    }
+    async getEmployees() {
+        const response = await fetch('api/employee');
+        const data = await response.json();
+        this.setState({ ...this.state,  employeeList: data.result });
     }
     async populateData() {
-        const response = await fetch('api/employee');
+        await this.getEmployees();
         const departmentsResponse = await fetch('api/department');
-        const data = await response.json();
         const departments = await departmentsResponse.json();
-        this.setState({ ...this.state, departments: departments.result, employeeList: data.result, loading: false });
+        this.setState({ ...this.state, departments: departments.result ,loading: false });
     }
 
 }

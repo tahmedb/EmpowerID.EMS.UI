@@ -66,8 +66,8 @@ namespace EmpowerID.EMS.UI.Controllers
         }
 
         // PUT api/<EmployeeController>/5
-        [HttpPut("{id}")]
-        public async Task<ResponseModel> Put(int id, [FromBody] TEntity value)
+        [HttpPut]
+        public async Task<ResponseModel> Put([FromBody] TEntity value)
         {
             var standardResponse = new ResponseModel { Message = "Record Updated", Result = { } };
             try
