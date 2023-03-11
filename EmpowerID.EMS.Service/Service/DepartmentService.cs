@@ -69,6 +69,19 @@ namespace EmpowerID.EMS.Service.Service
             }
         }
 
+        public async Task<List<Department>> SearchAsync(string term)
+        {
+            try
+            {
+                return await _departmentRepository.SearchDepartmentAsync(term);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error("Error while search record", ex);
+                throw;
+            }
+        }
+
         public async Task<bool> Update(Department entity)
         {
             try

@@ -30,6 +30,23 @@ namespace EmpowerID.EMS.UI.Controllers
             }
         }
 
+        [HttpGet("search/{term}")]
+        public async Task<ResponseModel> Get(string term)
+        {
+            var standardResponse = new ResponseModel { Message = "List of record" };
+            try
+            {
+                var result = await _service.SearchAsync(term);
+                standardResponse.Result = result;
+                return standardResponse;
+            }
+            catch (Exception ex)
+            {
+                standardResponse.Message = ex.Message;
+                return standardResponse;
+            }
+        }
+
         // GET api/<EmployeeController>/5
         [HttpGet("{id}")]
         public async Task<ResponseModel> Get(int id)

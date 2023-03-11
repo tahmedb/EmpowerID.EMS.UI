@@ -27,7 +27,7 @@ namespace EmpowerID.EMS.Service.Repository
             }
             catch (Exception ex)
             {
-                LogHelper.Error("Error while creating department",ex);
+                LogHelper.Error("Error while creating department", ex);
                 return false;
             }
         }
@@ -48,6 +48,11 @@ namespace EmpowerID.EMS.Service.Repository
         public async Task<List<Department>> GetDepartmentsAsync()
         {
             return await _dbContext.Query<Department>().ToListAsync();
+        }
+
+        public async Task<List<Department>> SearchDepartmentAsync(string term)
+        {
+            return await _dbContext.Query<Department>().Where(x => !string.IsNullOrEmpty(x.DepartmentName) && x.DepartmentName.Contains(term)).ToListAsync();
         }
 
         public async Task<bool> UpdateDepartmentAsync(Department Department)

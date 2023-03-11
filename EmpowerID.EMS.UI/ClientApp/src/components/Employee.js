@@ -25,7 +25,7 @@ export class Employee extends Component {
 
 
 
-     renderemployeeListTable(employeeList) {
+    renderemployeeListTable(employeeList) {
         return (
             <table className='table table-striped' aria-labelledby="tabelLabel">
                 <thead>
@@ -50,8 +50,12 @@ export class Employee extends Component {
                             <td>{employee.phoneNumber}</td>
                             <td>{employee.departments}</td>
                             <td>{employee.createdTime}</td>
-                            <td> <Button color="warning"
-                                onClick={() => this.toggle(employee)}>Edit</Button></td>
+                            <td>
+                                <Button color="warning"
+                                    onClick={() => this.toggle(employee)}>Edit</Button>
+                                <Button color="danger"
+                                    onClick={() => this.deleteEmployee(employee.id)}>Delete</Button>
+                            </td>
                         </tr>
                     )}
                 </tbody>
@@ -72,7 +76,8 @@ export class Employee extends Component {
                 <div>
                     <h1 id="tabelLabel" >Employee List</h1>
                     <Button color="primary"
-                        onClick={() => this.toggle()}>Add Modal</Button>
+                        onClick={() => this.toggle()}>Add Employee</Button>
+                    <Input onChange={(event) => this.searchEmployee(event)} value={this.state.searchTerm} className="mt-2" type="text" placeholder="type here for search..." />
                     {contents}
                 </div>
                 <div style={{
@@ -88,33 +93,33 @@ export class Employee extends Component {
                                 <Form>
                                     <FormGroup>
                                         <Label for="firstName">First Name</Label>
-                                        <Input onChange={(event) => this.handleChange(event)} value={formData.firstName} type="text" name="firstName" id="firstName" placeholder="First Name" />
+                                        <Input onChange={(event) => this.handleChange(event)} value={formData.firstName || ''} type="text" name="firstName" id="firstName" placeholder="First Name" />
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="lastName">Last Name</Label>
-                                        <Input onChange={(event) => this.handleChange(event)} value={formData.lastName}
+                                        <Input onChange={(event) => this.handleChange(event)} value={formData.lastName || ''}
                                             type="text" name="lastName" id="lastName" placeholder="Last Name" />
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="email">Email</Label>
-                                        <Input onChange={(event) => this.handleChange(event)} value={formData.email}
+                                        <Input onChange={(event) => this.handleChange(event)} value={formData.email || ''}
                                             type="email" name="email" id="email" placeholder="Email" />
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="phoneNumber">Phonenumber</Label>
-                                        <Input onChange={(event) => this.handleChange(event)} value={formData.phoneNumber}
+                                        <Input onChange={(event) => this.handleChange(event)} value={formData.phoneNumber || ''}
                                             type="email" name="phoneNumber" id="phoneNumber" placeholder="Phonenumber" />
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="departments">Departments</Label>
-                                        <Input onChange={(event) => this.handleChange(event)} 
+                                        <Input onChange={(event) => this.handleChange(event)}
                                             type="select" name="departmentids" id="departments" multiple>
                                             {(departments || []).map(department => <option key={department.id} value={department.id}>{department.name}</option>)}
                                         </Input>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="address">Address</Label>
-                                        <Input onChange={(event) => this.handleChange(event)} value={formData.address}
+                                        <Input onChange={(event) => this.handleChange(event)} value={formData.address || ''}
                                             type="textarea" name="address" id="address" />
                                     </FormGroup>
 
@@ -122,7 +127,7 @@ export class Employee extends Component {
                             </div>
                         </ModalBody>
                         <ModalFooter>
-                            <Button color="primary" onClick={() =>this.save()}>Save</Button>{' '}
+                            <Button color="primary" onClick={() => this.save()}>Save</Button>{' '}
                             <Button color="secondary" onClick={() => this.toggle()}>Cancel</Button>
                         </ModalFooter>
                     </Modal>
@@ -130,19 +135,41 @@ export class Employee extends Component {
             </>
         );
     }
+    async searchEmployee(event) {
+        console.log('event', event.target.value)
+        if (event.target.value) {
+            console.log('deb', event.target.value)
+            var fetchSearch = async () => {
+                const response = fetch('api/employee/search/' + event.target.value).then(response => response.json()).then(data => data).catch(error => alert(error));
+                let data = await response;
+                this.setState({ ...this.state, employeeList: data.result });
+            };
+            await fetchSearch();
+            //debouncer should be implemented for better performance
+            //var deb = this.debounce(() => fetchSearch());
+
+        } else {
+            await this.getEmployees();
+        }
+    }
     toggle(data) {
         var showdialog = this.state.showAddDialog;
         this.setState({ ...this.state, showAddDialog: !showdialog, formData: data })
     }
 
+
     async save() {
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         var formData = this.state.formData;
+        if (!formData) {
+            alert('please fill complete form')
+            return;
+        }
         var raw = JSON.stringify(this.state.formData);
 
         var requestOptions = {
-            method: formData.id ?'PUT': 'POST',
+            method: formData.id ? 'PUT' : 'POST',
             headers: myHeaders,
             body: raw,
             redirect: 'follow'
@@ -150,6 +177,10 @@ export class Employee extends Component {
 
         var response = await fetch("https://localhost:44441/api/employee", requestOptions)
         console.log(response);
+        if (response.status != 200) {
+            alert('please provide all data')
+            return;
+        }
         this.toggle();
         await this.getEmployees();
     }
@@ -159,16 +190,41 @@ export class Employee extends Component {
         console.log('state data', this.state)
         this.setState({ ...this.state, formData: { ...this.state.formData, [target.name]: target.value } });
     }
+
+    async deleteEmployee(id) {
+        var check = window.confirm('are you sure?');
+        var requestOptions = {
+            method: 'DELETE'
+        };
+        if (check) {
+            const response = fetch('api/employee/' + id, requestOptions).then(response => response.json()).then(data => data).catch(error => alert(error));
+            let data = await response;
+            await this.getEmployees();
+        }
+    }
+
     async getEmployees() {
         const response = await fetch('api/employee');
         const data = await response.json();
-        this.setState({ ...this.state,  employeeList: data.result });
+        this.setState({ ...this.state, employeeList: data.result });
     }
+
     async populateData() {
         await this.getEmployees();
         const departmentsResponse = await fetch('api/department');
         const departments = await departmentsResponse.json();
-        this.setState({ ...this.state, departments: departments.result ,loading: false });
+        this.setState({ ...this.state, departments: departments.result, loading: false });
+    }
+
+    debounce(fn, delay) {
+        let timeoutID;
+        return function (...args) {
+            if (timeoutID)
+                clearTimeout(timeoutID);
+            timeoutID = setTimeout(() => {
+                fn(...args)
+            }, delay);
+        }
     }
 
 }

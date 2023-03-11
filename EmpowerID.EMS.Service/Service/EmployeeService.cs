@@ -64,6 +64,19 @@ namespace EmpowerID.EMS.Service.Service
             }
         }
 
+        public async Task<List<Employee>> SearchAsync(string term)
+        {
+            try
+            {
+                return await _employeeRepository.SearchEmployeeAsync(term);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error("Error while search record", ex);
+                throw;
+            }
+        }
+
         public async Task<bool> Update(Employee entity)
         {
             try
