@@ -176,7 +176,7 @@ export class Employee extends Component {
             redirect: 'follow'
         };
         try {
-            var response = await fetch("https://localhost:44441/api/employee", requestOptions)
+            var response = await fetch("api/employee", requestOptions)
             if (response.status !== 200) {
                 alert('please provide all data ')
                 return;

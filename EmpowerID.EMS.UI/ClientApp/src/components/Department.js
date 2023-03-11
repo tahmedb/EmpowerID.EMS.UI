@@ -148,7 +148,7 @@ export class Department extends Component {
             redirect: 'follow'
         };
 
-        var response = await fetch("https://localhost:44441/api/department", requestOptions)
+        var response = await fetch("api/department", requestOptions)
         console.log(response);
         if (response.status !== 200) {
             alert('please provide all data')
