@@ -22,7 +22,7 @@ namespace EmpowerID.EMS.Service.Repository
             }
             catch (Exception ex)
             {
-                LogHelper.Error(ex);
+                LogHelper.Error("Error while creating employee",ex);
                 return false;
             }
         }

@@ -27,7 +27,7 @@ namespace EmpowerID.EMS.Service.Repository
             }
             catch (Exception ex)
             {
-                LogHelper.Error(ex);
+                LogHelper.Error("Error while creating department",ex);
                 return false;
             }
         }
