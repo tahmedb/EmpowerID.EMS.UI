@@ -4,7 +4,7 @@ import {
     Modal, ModalFooter,
     ModalHeader, ModalBody
 } from "reactstrap"
-import { Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
+import { Button, Form, FormGroup, Label, Input } from 'reactstrap';
 
 
 export class Employee extends Component {
@@ -177,7 +177,7 @@ export class Employee extends Component {
         };
         try {
             var response = await fetch("https://localhost:44441/api/employee", requestOptions)
-            if (response.status != 200) {
+            if (response.status !== 200) {
                 alert('please provide all data ')
                 return;
             }
@@ -201,7 +201,7 @@ export class Employee extends Component {
         };
         if (check) {
             const response = fetch('api/employee/' + id, requestOptions).then(response => response.json()).then(data => data).catch(error => alert(error));
-            let data = await response;
+            await response;
             await this.getEmployees();
         }
     }

@@ -4,7 +4,7 @@ import {
     Modal, ModalFooter,
     ModalHeader, ModalBody
 } from "reactstrap"
-import { Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
+import { Button, Form, FormGroup, Label, Input } from 'reactstrap';
 
 
 export class Department extends Component {
@@ -63,8 +63,6 @@ export class Department extends Component {
             : this.renderdepartmentListTable(this.state.departmentList);
 
         var formData = this.state.formData || {};
-        var departments = this.state.departments;
-
         return (
             <>
                 <div>
@@ -152,7 +150,7 @@ export class Department extends Component {
 
         var response = await fetch("https://localhost:44441/api/department", requestOptions)
         console.log(response);
-        if (response.status != 200) {
+        if (response.status !== 200) {
             alert('please provide all data')
             return;
         }
@@ -173,7 +171,7 @@ export class Department extends Component {
         };
         if (check) {
             const response = fetch('api/department/' + id, requestOptions).then(response => response.json()).then(data => data).catch(error => alert(error));
-            let data = await response;
+            await response;
             await this.getDepartments();
         }
     }
